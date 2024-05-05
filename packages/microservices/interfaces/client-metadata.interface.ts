@@ -9,8 +9,9 @@ import {
   KafkaOptions,
   MqttOptions,
   NatsOptions,
+  RdKafkaOptions,
   RedisOptions,
-  RmqOptions,
+  RmqOptions
 } from './microservice-configuration.interface';
 import { Serializer } from './serializer.interface';
 
@@ -20,6 +21,7 @@ export type ClientOptions =
   | MqttOptions
   | GrpcOptions
   | KafkaOptions
+  | RdKafkaOptions
   | TcpClientOptions
   | RmqOptions;
 
