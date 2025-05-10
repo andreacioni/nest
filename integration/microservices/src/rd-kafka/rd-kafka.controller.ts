@@ -24,11 +24,7 @@ export class RdKafkaController implements OnModuleInit, OnModuleDestroy {
 
   @Client({
     transport: Transport.RD_KAFKA,
-    options: {
-      client: {
-        'metadata.broker.list': 'localhost:9092',
-      },
-    },
+    options: { client: { 'metadata.broker.list': 'localhost:9092' } },
   })
   private readonly client: ClientRdKafka;
 
@@ -57,48 +53,36 @@ export class RdKafkaController implements OnModuleInit, OnModuleDestroy {
 
   // async notify
   @Post('notify')
-  async sendNotification(): Promise<any> {
+  sendNotification(): Observable<any> {
     return this.client.emit('notify', { notify: true });
   }
 
   // async notify with key
   @Post('notifyWithKey')
-  async sendNotificationWithKey(): Promise<any> {
-    return this.client.emit('notify.with.key', { 
+  sendNotificationWithKey(): Observable<any> {
+    return this.client.emit('notify.with.key', {
       key: 'unique-key',
-      value: {
-        notify: true
-      }
+      value: { notify: true },
     });
   }
 
   // async notify with key and headers
   @Post('notifyWithKeyAndHeaders')
-  async sendNotificationWithKeyAndHeaders(): Promise<any> {
-    return this.client.emit('notify.with.key.and.headers', { 
+  sendNotificationWithKeyAndHeaders(): Observable<any> {
+    return this.client.emit('notify.with.key.and.headers', {
       key: 'unique-key-with-header',
-      headers: {
-        'custom': 'something'
-      },
-      value: {
-        notify: true
-      }
+      headers: { custom: 'something' },
+      value: { notify: true },
     });
   }
 
   // async notify with key and headers
   @Post('notifyWithKeyAndManyHeaders')
-  async sendNotificationWithKeyAndManyHeaders(): Promise<any> {
-    return this.client.emit('notify.with.key.and.many.headers', { 
+  sendNotificationWithKeyAndManyHeaders(): Observable<any> {
+    return this.client.emit('notify.with.key.and.many.headers', {
       key: 'unique-key-with-many-headers',
-      headers: {
-        'custom': 'something',
-        'custom2': 'something2',
-        'int': 123
-      },
-      value: {
-        notify: true
-      }
+      headers: { custom: 'something', custom2: 'something2', int: 123 },
+      value: { notify: true },
     });
   }
 
@@ -111,9 +95,7 @@ export class RdKafkaController implements OnModuleInit, OnModuleDestroy {
     const result = await lastValueFrom(
       this.client.send('math.sum.sync.kafka.message', {
         key: '1',
-        value: {
-          numbers: data,
-        },
+        value: { numbers: data },
       }),
     );
     return result;
@@ -127,9 +109,7 @@ export class RdKafkaController implements OnModuleInit, OnModuleDestroy {
   ): Promise<Observable<any>> {
     const result = await lastValueFrom(
       this.client.send('math.sum.sync.without.key', {
-        value: {
-          numbers: data,
-        },
+        value: { numbers: data },
       }),
     );
     return result;
@@ -142,9 +122,7 @@ export class RdKafkaController implements OnModuleInit, OnModuleDestroy {
     @Body() data: number[],
   ): Promise<Observable<any>> {
     const result = await lastValueFrom(
-      this.client.send('math.sum.sync.plain.object', {
-        numbers: data,
-      }),
+      this.client.send('math.sum.sync.plain.object', { numbers: data }),
     );
     return result;
   }
@@ -183,12 +161,7 @@ export class RdKafkaController implements OnModuleInit, OnModuleDestroy {
   @HttpCode(200)
   async createUser(@Body() user: UserDto): Promise<Observable<any>> {
     const result = await lastValueFrom(
-      this.client.send('user.create', {
-        key: '1',
-        value: {
-          user,
-        },
-      }),
+      this.client.send('user.create', { key: '1', value: { user } }),
     );
     return result;
   }
@@ -198,12 +171,7 @@ export class RdKafkaController implements OnModuleInit, OnModuleDestroy {
   @HttpCode(200)
   async createBusiness(@Body() business: BusinessDto) {
     const result = await lastValueFrom(
-      this.client.send('business.create', {
-        key: '1',
-        value: {
-          business,
-        },
-      }),
+      this.client.send('business.create', { key: '1', value: { business } }),
     );
     return result;
   }

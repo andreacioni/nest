@@ -6,5 +6,5 @@ export enum Transport {
   GRPC,
   RMQ,
   KAFKA,
-  RD_KAFKA
+  RD_KAFKA,
 }

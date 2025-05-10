@@ -1,5 +1,11 @@
 import { Controller, Logger } from '@nestjs/common';
-import { Ctx, EventPattern, MessagePattern, Payload, RdKafkaContext } from '@nestjs/microservices';
+import {
+  Ctx,
+  EventPattern,
+  MessagePattern,
+  Payload,
+  RdKafkaContext,
+} from '@nestjs/microservices';
 import { BusinessDto } from './dtos/business.dto';
 import { UserDto } from './dtos/user.dto';
 import { BusinessEntity } from './entities/business.entity';
@@ -21,24 +27,29 @@ export class RdKafkaMessagesController {
   notifyWithKey(@Payload() data: any, @Ctx() context: RdKafkaContext) {
     // console.log('notifyWithKey data', data);
     // console.log('notifyWithKey context', context);
-    RdKafkaController.IS_NOTIFIED_WITH_KEY = data.notify;
+    RdKafkaController.IS_NOTIFIED_WITH_KEY = data.value.notify;
   }
 
   @EventPattern('notify.with.key.and.headers')
-  notifyWithKeyAndHeaders(@Payload() data: any, @Ctx() context: RdKafkaContext) {
+  notifyWithKeyAndHeaders(
+    @Payload() data: any,
+    @Ctx() context: RdKafkaContext,
+  ) {
     // console.log('notifyWithKeyAndHeaders data', data);
     // console.log('notifyWithKeyAndHeaders context', context);
     // console.log('notifyWithKeyAndHeaders context message', context.getMessage());
-    RdKafkaController.IS_NOTIFIED_WITH_KEY_AND_HEADERS = data.notify;
+    RdKafkaController.IS_NOTIFIED_WITH_KEY_AND_HEADERS = data.value.notify;
   }
 
-
   @EventPattern('notify.with.key.and.many.headers')
-  notifyWithKeyAndManyHeaders(@Payload() data: any, @Ctx() context: RdKafkaContext) {
+  notifyWithKeyAndManyHeaders(
+    @Payload() data: any,
+    @Ctx() context: RdKafkaContext,
+  ) {
     // console.log('notifyWithKeyAndHeaders data', data);
     // console.log('notifyWithKeyAndHeaders context', context);
     // console.log('notifyWithKeyAndHeaders context message', context.getMessage());
-    RdKafkaController.IS_NOTIFIED_WITH_KEY_AND_MANY_HEADERS = data.notify;
+    RdKafkaController.IS_NOTIFIED_WITH_KEY_AND_MANY_HEADERS = data.value.notify;
   }
 
   @MessagePattern('math.sum.sync.kafka.message')

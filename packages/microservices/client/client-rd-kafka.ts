@@ -172,12 +172,12 @@ export class ClientRdKafka extends ClientProxy {
 
         // TODO: remove the following debug messages later
         // logging debug messages, if debug is enabled
-        this.producer.on('event.log', (log) => {
+        this.producer.on('event.log', log => {
           this.logger.debug(log);
         });
 
         //logging all errors
-        this.producer.on('event.error', (err) => {
+        this.producer.on('event.error', err => {
           this.logger.error(err);
         });
 
@@ -329,13 +329,13 @@ export class ClientRdKafka extends ClientProxy {
       Promise.resolve(this.serializer.serialize(packet.data, { pattern }))
         .then((serializedPacket: RdKafkaRequest) => {
           serializedPacket.headers.push({
-            [KafkaHeaders.CORRELATION_ID]: packet.id
+            [KafkaHeaders.CORRELATION_ID]: packet.id,
           });
           serializedPacket.headers.push({
-            [KafkaHeaders.REPLY_TOPIC]: replyTopic
+            [KafkaHeaders.REPLY_TOPIC]: replyTopic,
           });
           serializedPacket.headers.push({
-            [KafkaHeaders.REPLY_PARTITION]: replyPartition
+            [KafkaHeaders.REPLY_PARTITION]: replyPartition,
           });
 
           // TODO: fix the serialized packet type either in the confluent lib or nestjs so user can pass their own headers

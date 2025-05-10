@@ -20,7 +20,7 @@ import {
   ConsumerGlobalConfig,
   GlobalConfig,
   HighLevelProducer,
-  MessageHeader
+  MessageHeader,
 } from '../external/rd-kafka.interface';
 import { KafkaLogger, RdKafkaParser } from '../helpers';
 import {
@@ -54,22 +54,27 @@ export class ServerRdKafka extends Server implements CustomTransportStrategy {
       this.getOptionsProp(this.options, 'client') || ({} as GlobalConfig);
 
     const consumerOptions =
-      this.getOptionsProp(this.options, 'consumer') || ({} as ConsumerGlobalConfig);
+      this.getOptionsProp(this.options, 'consumer') ||
+      ({} as ConsumerGlobalConfig);
 
     const postfixId =
       this.getOptionsProp(this.options, 'postfixId') ?? '-server';
 
-    this.brokers = clientOptions['metadata.broker.list'] || KAFKA_DEFAULT_BROKER;
+    this.brokers =
+      clientOptions['metadata.broker.list'] || KAFKA_DEFAULT_BROKER;
 
     // append a unique id to the clientId and groupId
     // so they don't collide with a microservices client
     this.clientId =
       (clientOptions['client.id'] || KAFKA_DEFAULT_CLIENT) + postfixId;
 
-    this.groupId = (consumerOptions['group.id'] || KAFKA_DEFAULT_GROUP) + postfixId;
+    this.groupId =
+      (consumerOptions['group.id'] || KAFKA_DEFAULT_GROUP) + postfixId;
 
-    kafkaPackage = this.loadPackage('@confluentinc/kafka-javascript', ServerRdKafka.name, () =>
-      require('@confluentinc/kafka-javascript'),
+    kafkaPackage = this.loadPackage(
+      '@confluentinc/kafka-javascript',
+      ServerRdKafka.name,
+      () => require('@confluentinc/kafka-javascript'),
     );
 
     this.parser = new RdKafkaParser((options && options.parser) || undefined);
@@ -98,7 +103,7 @@ export class ServerRdKafka extends Server implements CustomTransportStrategy {
   public async disconnect(client: Client<any>): Promise<void> {
     // wrapping with a promise to avoid creating event handlers manually for the disconnect
     return new Promise((resolve, reject) => {
-      return client.disconnect((err) => {
+      return client.disconnect(err => {
         if (err) {
           return reject(err);
         }
@@ -108,17 +113,27 @@ export class ServerRdKafka extends Server implements CustomTransportStrategy {
   }
 
   public async start(callback: () => void): Promise<void> {
-    const consumerOptions = Object.assign({}, this.options.client || {}, this.options.consumer || {}, {
-      'client.id': this.clientId,
-      'metadata.broker.list': this.brokers,
-      'group.id': this.groupId,
-    });
+    const consumerOptions = Object.assign(
+      {},
+      this.options.client || {},
+      this.options.consumer || {},
+      {
+        'client.id': this.clientId,
+        'metadata.broker.list': this.brokers,
+        'group.id': this.groupId,
+      },
+    );
     this.consumer = new kafkaPackage.KafkaConsumer(consumerOptions);
 
-    const producerOptions = Object.assign({}, this.options.client || {}, this.options.producer || {}, {
-      'client.id': this.clientId,
-      'metadata.broker.list': this.brokers
-    });
+    const producerOptions = Object.assign(
+      {},
+      this.options.client || {},
+      this.options.producer || {},
+      {
+        'client.id': this.clientId,
+        'metadata.broker.list': this.brokers,
+      },
+    );
     this.producer = new kafkaPackage.HighLevelProducer(producerOptions);
 
     await this.connect(this.producer);
@@ -133,21 +148,24 @@ export class ServerRdKafka extends Server implements CustomTransportStrategy {
   public async connect(client: Client<any>): Promise<void> {
     // wrapping with a promise to avoid creating event handlers manually for the connect
     return new Promise((resolve, reject) => {
-      return client.connect({
-        // TODO: make this more efficient by only getting metadata for the topics we care about
-        allTopics: true,
-      }, (err) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve();
-      });
+      return client.connect(
+        {
+          // TODO: make this more efficient by only getting metadata for the topics we care about
+          allTopics: true,
+        },
+        err => {
+          if (err) {
+            return reject(err);
+          }
+          resolve();
+        },
+      );
     });
   }
 
   public async bindEvents(consumer: Consumer) {
     const registeredPatterns = [...this.messageHandlers.keys()];
-    
+
     if (registeredPatterns.length > 0) {
       this.consumer.subscribe(registeredPatterns);
     }
@@ -185,7 +203,7 @@ export class ServerRdKafka extends Server implements CustomTransportStrategy {
       message.partition,
       message.topic,
       this.consumer,
-      this.producer
+      this.producer,
     ]);
     const handler = this.getHandlerByPattern(packet.pattern);
     // if the correlation id or reply topic is not set
@@ -251,7 +269,9 @@ export class ServerRdKafka extends Server implements CustomTransportStrategy {
     replyPartition: number,
     correlationId: string,
   ): Promise<void> {
-    const outgoingMessage = await this.serializer.serialize(outgoingResponse.response);
+    const outgoingMessage = await this.serializer.serialize(
+      outgoingResponse.response,
+    );
 
     const headers: MessageHeader = {};
 
@@ -261,12 +281,20 @@ export class ServerRdKafka extends Server implements CustomTransportStrategy {
 
     // TODO: figure out a better way, rather than using a promise
     return new Promise((resolve, reject) => {
-      this.producer.produce(replyTopic, replyPartition, outgoingMessage, null, null, [headers], (err, offset) => {
-        if (err) {
-          return reject(err);
-        }
-        return resolve();
-      });
+      this.producer.produce(
+        replyTopic,
+        replyPartition,
+        outgoingMessage,
+        null,
+        null,
+        [headers],
+        (err, offset) => {
+          if (err) {
+            return reject(err);
+          }
+          return resolve();
+        },
+      );
     });
   }
 
@@ -323,6 +351,7 @@ export class ServerRdKafka extends Server implements CustomTransportStrategy {
   }
 
   protected initializeDeserializer(options: RdKafkaOptions['options']) {
-    this.deserializer = options?.deserializer ?? new RdKafkaRequestDeserializer();
+    this.deserializer =
+      options?.deserializer ?? new RdKafkaRequestDeserializer();
   }
 }

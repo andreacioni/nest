@@ -1,4 +1,8 @@
-import { KafkaConsumer as Consumer, HighLevelProducer, Message } from '../external/rd-kafka.interface';
+import {
+  KafkaConsumer as Consumer,
+  HighLevelProducer,
+  Message,
+} from '../external/rd-kafka.interface';
 import { BaseRpcContext } from './base-rpc.context';
 
 type RdKafkaContextArgs = [

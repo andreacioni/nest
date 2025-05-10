@@ -3,9 +3,6 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { Test } from '@nestjs/testing';
 import { expect } from 'chai';
 import * as request from 'supertest';
-import { BusinessDto } from '../src/rd-kafka/dtos/business.dto';
-import { UserDto } from '../src/rd-kafka/dtos/user.dto';
-import { UserEntity } from '../src/rd-kafka/entities/user.entity';
 import { RdKafkaController } from '../src/rd-kafka/rd-kafka.controller';
 import { RdKafkaMessagesController } from '../src/rd-kafka/rd-kafka.messages.controller';
 
@@ -27,11 +24,7 @@ describe('RdKafka transport', function () {
 
     app.connectMicroservice<MicroserviceOptions>({
       transport: Transport.RD_KAFKA,
-      options: {
-        client: {
-          'metadata.broker.list': 'localhost:9092'
-        }
-      },
+      options: { client: { 'metadata.broker.list': 'localhost:9092' } },
     });
     app.enableShutdownHooks();
     await app.startAllMicroservices();
@@ -80,7 +73,8 @@ describe('RdKafka transport', function () {
       .send()
       .end(() => {
         setTimeout(() => {
-          expect(RdKafkaController.IS_NOTIFIED_WITH_KEY_AND_MANY_HEADERS).to.be.true;
+          expect(RdKafkaController.IS_NOTIFIED_WITH_KEY_AND_MANY_HEADERS).to.be
+            .true;
           done();
         }, 1000);
       });

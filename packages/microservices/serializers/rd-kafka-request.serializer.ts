@@ -11,7 +11,7 @@ import { MessageHeaderList } from '../external/rd-kafka.interface';
 export interface RdKafkaRequest<T = any> {
   key: Buffer | null;
   value: T;
-  headers: MessageHeaderList
+  headers: MessageHeaderList;
 }
 
 /**
@@ -42,17 +42,17 @@ export class RdKafkaRequestSerializer
       value.headers = [];
     } else if (isObject(value.headers)) {
       // header collections need to go from an object to an array of objects
-      value.headers = Object.keys(value.headers).map((key) => {
+      value.headers = Object.keys(value.headers).map(key => {
         return {
-          [key]: this.encode(value.headers[key])
+          [key]: this.encode(value.headers[key]),
         };
       });
     } else if (Array.isArray(value.headers)) {
       // encode the headers
-      value.headers = value.headers.map((header) => {
+      value.headers = value.headers.map(header => {
         // always use the first key in the object
         return {
-          [Object.keys(header)[0]]: this.encode(header[Object.keys(header)[0]])
+          [Object.keys(header)[0]]: this.encode(header[Object.keys(header)[0]]),
         };
       });
     }
@@ -73,7 +73,7 @@ export class RdKafkaRequestSerializer
       if (isPlainObject(value) || Array.isArray(value)) {
         return Buffer.from(JSON.stringify(value));
       }
-      
+
       return Buffer.from(value.toString());
     } else if (isUndefined(value)) {
       return null;

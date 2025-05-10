@@ -25,7 +25,7 @@ export class RdKafkaParser {
     }
     if (!isNil(data.headers)) {
       // iterate through the headers, decode, and flatten
-      data.headers.forEach((header) => {
+      data.headers.forEach(header => {
         Object.keys(header).forEach((key: string) => {
           result.headers[key] = this.decode(header[key]);
         });
